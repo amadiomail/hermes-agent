@@ -325,6 +325,17 @@ This is working as intended — Hermes never silently runs destructive commands.
 - If you must use `sudo`, configure passwordless sudo for specific commands in `/etc/sudoers`
 - Or switch to the terminal interface for administrative tasks: `hermes chat`
 
+#### `OSError: [Errno 22] Invalid argument` when launching `hermes chat` in scripts/pipes
+
+**Cause:** Hermes chat mode is interactive and requires a real TTY. On some Python setups (especially uv-managed Python on macOS), launching chat with non-interactive stdin can trigger selector registration failures (`Errno 22`, `fd 0` issues).
+
+**Solution:**
+- Run chat directly in an interactive terminal instead of piping stdin
+- For automation, use single-query mode (`hermes -q "..."`) instead of interactive chat mode
+- If you still hit TTY-related startup errors, reinstall Python via Homebrew or pyenv, then run `hermes setup`
+
+Hermes now catches this startup case and exits with a clear, user-friendly error instead of a traceback.
+
 #### Docker backend not connecting
 
 **Cause:** Docker daemon isn't running or the user lacks permissions.
